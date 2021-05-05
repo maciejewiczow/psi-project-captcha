@@ -1,4 +1,20 @@
 import cv2
+import imageio
+
+def readImage(imagePath):
+    image = cv2.imread(imagePath)
+
+    if image is None:
+        image = imageio.mimread(imagePath)
+
+        # ignore gifs with more than one frame
+        if len(image) > 1:
+            return None
+
+        # convert form RGB to BGR
+        image = cv2.cvtColor(image[0], cv2.COLOR_RGB2BGR)
+
+    return image
 
 def getRegionsFromImage(image, margin = 5):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -12,4 +28,4 @@ def getRegionsFromImage(image, margin = 5):
 
     regions = sorted(contours, key=lambda x: x[0])
 
-    return [gray[y:y + height, x:x + width] for (x, y, width, height) in regions]
+    return [gray[y:y + height, x:x + width] for (x, y, width, height) in regions], regions
